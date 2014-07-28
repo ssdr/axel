@@ -1,0 +1,187 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+AXEL_VERSION_STRING	axel.h	70;"	d
+DEFAULT_USER_AGENT	axel.h	71;"	d
+FTP_PASSIVE	ftp.h	26;"	d
+FTP_PORT	ftp.h	27;"	d
+MAX_ADD_HEADERS	axel.h	68;"	d
+MAX_QUERY	http.h	26;"	d
+MAX_REDIR	axel.h	69;"	d
+MAX_STRING	axel.h	67;"	d
+MOFILES	Makefile	/^MOFILES = nl.mo de.mo ru.mo zh_CN.mo$/;"	m
+PACKAGE	axel.h	58;"	d
+PROTO_DEFAULT	conn.h	28;"	d
+PROTO_FTP	conn.h	26;"	d
+PROTO_HTTP	conn.h	27;"	d
+SPEED_ACTIVE	search.c	162;"	d	file:
+SPEED_DONE	search.c	164;"	d	file:
+SPEED_ERROR	search.c	163;"	d	file:
+_	axel.h	59;"	d
+_	axel.h	63;"	d
+_GNU_SOURCE	axel.h	35;"	d
+add_header	conf.h	/^	char add_header[MAX_ADD_HEADERS][MAX_STRING];$/;"	m	struct:__anon5
+add_header_count	conf.h	/^	int add_header_count;$/;"	m	struct:__anon5
+alternate_output	conf.h	/^	int alternate_output;$/;"	m	struct:__anon5
+auth	http.h	/^	char auth[MAX_STRING];$/;"	m	struct:__anon4
+axel_close	axel.c	/^void axel_close( axel_t *axel )$/;"	f
+axel_divide	axel.c	/^static void axel_divide( axel_t *axel )$/;"	f	file:
+axel_do	axel.c	/^void axel_do( axel_t *axel )$/;"	f
+axel_message	axel.c	/^static void axel_message( axel_t *axel, char *format, ... )$/;"	f	file:
+axel_new	axel.c	/^axel_t *axel_new( conf_t *conf, int count, void *url )$/;"	f
+axel_open	axel.c	/^int axel_open( axel_t *axel )$/;"	f
+axel_options	text.c	/^static struct option axel_options[] =$/;"	v	typeref:struct:option	file:
+axel_start	axel.c	/^void axel_start( axel_t *axel )$/;"	f
+axel_t	axel.h	/^} axel_t;$/;"	t	typeref:struct:__anon2
+buffer	axel.c	/^static char *buffer = NULL;$/;"	v	file:
+buffer_size	conf.h	/^	int buffer_size;$/;"	m	struct:__anon5
+bytes_done	axel.h	/^	long long bytes_done, start_byte, size;$/;"	m	struct:__anon2
+bytes_per_second	axel.h	/^	int bytes_per_second;$/;"	m	struct:__anon2
+c	gui/kapt/axel-kapt	/^    c = ""$/;"	v
+c	gui/kapt/axel-kapt	/^    c = string.join(sys.argv[1:])$/;"	v
+cmd	gui/kapt/axel-kapt	/^cmd = "echo '" + a + "'" + c + "'" + b + "'" + " | kaptain" $/;"	v
+conf	axel.h	/^	conf_t conf[1];$/;"	m	struct:__anon2
+conf	conn.h	/^	conf_t *conf;$/;"	m	struct:__anon7
+conf	search.h	/^	conf_t *conf;$/;"	m	struct:__anon6
+conf_init	conf.c	/^int conf_init( conf_t *conf )$/;"	f
+conf_loadfile	conf.c	/^int conf_loadfile( conf_t *conf, char *file )$/;"	f
+conf_t	conf.h	/^} conf_t;$/;"	t	typeref:struct:__anon5
+conn	axel.h	/^	conn_t *conn;$/;"	m	struct:__anon2
+conn_disconnect	conn.c	/^void conn_disconnect( conn_t *conn )$/;"	f
+conn_exec	conn.c	/^int conn_exec( conn_t *conn )$/;"	f
+conn_info	conn.c	/^int conn_info( conn_t *conn )$/;"	f
+conn_init	conn.c	/^int conn_init( conn_t *conn )$/;"	f
+conn_set	conn.c	/^int conn_set( conn_t *conn, char *set_url )$/;"	f
+conn_setup	conn.c	/^int conn_setup( conn_t *conn )$/;"	f
+conn_t	conn.h	/^} conn_t;$/;"	t	typeref:struct:__anon7
+conn_url	conn.c	/^char *conn_url( conn_t *conn )$/;"	f
+connection_timeout	conf.h	/^	int connection_timeout;$/;"	m	struct:__anon5
+currentbyte	conn.h	/^	long long int currentbyte;$/;"	m	struct:__anon7
+cwd	ftp.h	/^	char cwd[MAX_STRING];$/;"	m	struct:__anon3
+data_fd	ftp.h	/^	int data_fd;$/;"	m	struct:__anon3
+default_filename	conf.h	/^	char default_filename[MAX_STRING];$/;"	m	struct:__anon5
+delay_time	axel.h	/^	int delay_time;$/;"	m	struct:__anon2
+dir	conn.h	/^	char dir[MAX_STRING];$/;"	m	struct:__anon7
+enabled	conn.h	/^	int enabled;$/;"	m	struct:__anon7
+fd	conn.h	/^	int fd;$/;"	m	struct:__anon7
+fd	ftp.h	/^	int fd;$/;"	m	struct:__anon3
+fd	http.h	/^	int fd;$/;"	m	struct:__anon4
+file	conn.h	/^	char file[MAX_STRING];$/;"	m	struct:__anon7
+filename	axel.h	/^	char filename[MAX_STRING];$/;"	m	struct:__anon2
+finish_time	axel.h	/^	int next_state, finish_time;$/;"	m	struct:__anon2
+firstbyte	http.h	/^	long long int firstbyte;$/;"	m	struct:__anon4
+ftp	conn.h	/^	ftp_t ftp[1];$/;"	m	struct:__anon7
+ftp_command	ftp.c	/^int ftp_command( ftp_t *conn, char *format, ... )$/;"	f
+ftp_connect	ftp.c	/^int ftp_connect( ftp_t *conn, char *host, int port, char *user, char *pass )$/;"	f
+ftp_cwd	ftp.c	/^int ftp_cwd( ftp_t *conn, char *cwd )$/;"	f
+ftp_data	ftp.c	/^int ftp_data( ftp_t *conn )$/;"	f
+ftp_disconnect	ftp.c	/^void ftp_disconnect( ftp_t *conn )$/;"	f
+ftp_mode	ftp.h	/^	int ftp_mode;$/;"	m	struct:__anon3
+ftp_size	ftp.c	/^long long int ftp_size( ftp_t *conn, char *file, int maxredir )$/;"	f
+ftp_t	ftp.h	/^} ftp_t;$/;"	t	typeref:struct:__anon3
+ftp_wait	ftp.c	/^int ftp_wait( ftp_t *conn )$/;"	f
+get_config_number	conf.c	35;"	d	file:
+get_config_string	conf.c	29;"	d	file:
+get_if_ip	tcp.c	/^int get_if_ip( char *iface, char *ip )$/;"	f
+getopt_long	text.c	40;"	d	file:
+gettime	axel.c	/^double gettime()$/;"	f
+headers	http.h	/^	char headers[MAX_QUERY];$/;"	m	struct:__anon4
+host	conn.h	/^	char host[MAX_STRING];$/;"	m	struct:__anon7
+host	http.h	/^	char host[MAX_STRING];$/;"	m	struct:__anon4
+http	conn.h	/^	http_t http[1];$/;"	m	struct:__anon7
+http_addheader	http.c	/^void http_addheader( http_t *conn, char *format, ... )$/;"	f
+http_connect	http.c	/^int http_connect( http_t *conn, int proto, char *proxy, char *host, int port, char *user, char *pass )$/;"	f
+http_decode	http.c	/^void http_decode( char *s )$/;"	f
+http_disconnect	http.c	/^void http_disconnect( http_t *conn )$/;"	f
+http_encode	http.c	/^void http_encode( char *s )$/;"	f
+http_exec	http.c	/^int http_exec( http_t *conn )$/;"	f
+http_get	http.c	/^void http_get( http_t *conn, char *lurl )$/;"	f
+http_header	http.c	/^char *http_header( http_t *conn, char *header )$/;"	f
+http_proxy	conf.h	/^	char http_proxy[MAX_STRING];$/;"	m	struct:__anon5
+http_size	http.c	/^long long int http_size( http_t *conn )$/;"	f
+http_t	http.h	/^} http_t;$/;"	t	typeref:struct:__anon4
+if_t	axel.h	/^typedef message_t if_t;$/;"	t
+interfaces	conf.h	/^	if_t *interfaces;$/;"	m	struct:__anon5
+last_transfer	conn.h	/^	int last_transfer;$/;"	m	struct:__anon7
+lastbyte	conn.h	/^	long long int lastbyte;$/;"	m	struct:__anon7
+lastbyte	http.h	/^	long long int lastbyte;$/;"	m	struct:__anon4
+local_if	conn.h	/^	char *local_if;$/;"	m	struct:__anon7
+local_if	ftp.h	/^	char *local_if;$/;"	m	struct:__anon3
+local_if	http.h	/^	char *local_if;$/;"	m	struct:__anon4
+main	search.c	/^int main( int argc, char *argv[] )$/;"	f
+main	text.c	/^int main( int argc, char *argv[] )$/;"	f
+max	axel.h	90;"	d
+max_speed	conf.h	/^	int max_speed;$/;"	m	struct:__anon5
+message	axel.h	/^	message_t *message;$/;"	m	struct:__anon2
+message	conn.h	/^	char *message;$/;"	m	struct:__anon7
+message	ftp.h	/^	char *message;$/;"	m	struct:__anon3
+message_t	axel.h	/^} message_t;$/;"	t	typeref:struct:__anon1
+min	axel.h	89;"	d
+next	axel.h	/^	void *next;$/;"	m	struct:__anon1
+next_state	axel.h	/^	int next_state, finish_time;$/;"	m	struct:__anon2
+no_proxy	conf.h	/^	char no_proxy[MAX_STRING];$/;"	m	struct:__anon5
+num_connections	conf.h	/^	int num_connections;$/;"	m	struct:__anon5
+os	gui/kapt/axel-kapt	/^import sys, os, string$/;"	i
+outfd	axel.h	/^	int outfd;$/;"	m	struct:__anon2
+parse_interfaces	conf.c	/^int parse_interfaces( conf_t *conf, char *s )$/;"	f
+pass	conn.h	/^	char pass[MAX_STRING];$/;"	m	struct:__anon7
+port	conn.h	/^	int port;$/;"	m	struct:__anon7
+print_alternate_output	text.c	/^static void print_alternate_output(axel_t *axel) $/;"	f	file:
+print_commas	text.c	/^void print_commas( long long int bytes_done )$/;"	f
+print_help	text.c	/^void print_help()$/;"	f
+print_messages	text.c	/^void print_messages( axel_t *axel )$/;"	f
+print_version	text.c	/^void print_version()$/;"	f
+proto	conn.h	/^	int proto;$/;"	m	struct:__anon7
+proto	http.h	/^	int proto;			\/* FTP through HTTP proxies	*\/$/;"	m	struct:__anon4
+proxy	conn.h	/^	int proxy;$/;"	m	struct:__anon7
+proxy	http.h	/^	int proxy;$/;"	m	struct:__anon4
+ready	axel.h	/^	int ready;$/;"	m	struct:__anon2
+reconnect_delay	conf.h	/^	int reconnect_delay;$/;"	m	struct:__anon5
+request	http.h	/^	char request[MAX_QUERY];$/;"	m	struct:__anon4
+run	text.c	/^int run = 1;$/;"	v
+save_state	axel.c	/^void save_state( axel_t *axel )$/;"	f
+save_state_interval	conf.h	/^	int save_state_interval;$/;"	m	struct:__anon5
+search_amount	conf.h	/^	int search_amount;$/;"	m	struct:__anon5
+search_getspeeds	search.c	/^int search_getspeeds( search_t *results, int count )$/;"	f
+search_makelist	search.c	/^int search_makelist( search_t *results, char *url )$/;"	f
+search_sortlist	search.c	/^void search_sortlist( search_t *results, int count )$/;"	f
+search_sortlist_qsort	search.c	/^int search_sortlist_qsort( const void *a, const void *b )$/;"	f
+search_speedtest	search.c	/^void *search_speedtest( void *r )$/;"	f
+search_t	search.h	/^} search_t;$/;"	t	typeref:struct:__anon6
+search_threads	conf.h	/^	int search_threads;$/;"	m	struct:__anon5
+search_timeout	conf.h	/^	int search_timeout;$/;"	m	struct:__anon5
+search_top	conf.h	/^	int search_top;$/;"	m	struct:__anon5
+setup_thread	axel.c	/^void *setup_thread( void *c )$/;"	f
+setup_thread	conn.h	/^	pthread_t setup_thread[1];$/;"	m	struct:__anon7
+size	axel.h	/^	long long bytes_done, start_byte, size;$/;"	m	struct:__anon2
+size	conn.h	/^	long long int size;		\/* File size, not 'connection size'..	*\/$/;"	m	struct:__anon7
+size	search.h	/^	int speed, size;$/;"	m	struct:__anon6
+size_human	text.c	/^char *size_human( long long int value )$/;"	f
+speed	search.h	/^	int speed, size;$/;"	m	struct:__anon6
+speed_start_time	search.h	/^	double speed_start_time;$/;"	m	struct:__anon6
+speed_thread	search.h	/^	pthread_t speed_thread[1];$/;"	m	struct:__anon6
+start_byte	axel.h	/^	long long bytes_done, start_byte, size;$/;"	m	struct:__anon2
+start_time	axel.h	/^	double start_time;$/;"	m	struct:__anon2
+state	conn.h	/^	int state;$/;"	m	struct:__anon7
+status	ftp.h	/^	int status;$/;"	m	struct:__anon3
+status	http.h	/^	int status;$/;"	m	struct:__anon4
+stop	text.c	/^void stop( int signal )$/;"	f
+string	conn.c	/^char string[MAX_STRING];$/;"	v
+string	gui/kapt/axel-kapt	/^import sys, os, string$/;"	i
+string	text.c	/^static char string[MAX_STRING];$/;"	v	file:
+strip_cgi_parameters	conf.h	/^	int strip_cgi_parameters;$/;"	m	struct:__anon5
+strrstr	search.c	/^char *strrstr( char *haystack, char *needle )$/;"	f
+supported	conn.h	/^	int supported;$/;"	m	struct:__anon7
+sys	gui/kapt/axel-kapt	/^import sys, os, string$/;"	i
+tcp_connect	tcp.c	/^int tcp_connect( char *hostname, int port, char *local_if )$/;"	f
+text	axel.h	/^	char text[MAX_STRING];$/;"	m	struct:__anon1
+time_human	text.c	/^char *time_human( int value )$/;"	f
+url	axel.h	/^	url_t *url;$/;"	m	struct:__anon2
+url	search.h	/^	char url[MAX_STRING];$/;"	m	struct:__anon6
+url_t	axel.h	/^typedef message_t url_t;$/;"	t
+user	conn.h	/^	char user[MAX_STRING];$/;"	m	struct:__anon7
+user_agent	conf.h	/^	char user_agent[MAX_STRING];$/;"	m	struct:__anon5
+verbose	conf.h	/^	int verbose;$/;"	m	struct:__anon5
