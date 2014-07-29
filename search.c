@@ -170,10 +170,18 @@ int search_makelist( search_t *results, char *url )
 #define SPEED_ERROR	-2
 #define SPEED_DONE	-3	/* Or >0				*/
 
+// added by liuyan
+// 可以用来测速，只选择比镜像速度好的节点
+int search_getspeeds2( search_t *results, int count )
+{
+	return 0;
+}
+
 int search_getspeeds( search_t *results, int count )
 {
 	int i, running = 0, done = 0, correct = 0;
 	
+	// 先剔除已经测过速的
 	for( i = 0; i < count; i ++ ) if( results[i].speed )
 	{
 		results[i].speed_start_time = 0;
@@ -182,6 +190,7 @@ int search_getspeeds( search_t *results, int count )
 			correct ++;
 	}
 	
+	// 剩下的再测下速吧
 	while( done < count )
 	{
 		for( i = 0; i < count; i ++ )

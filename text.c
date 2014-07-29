@@ -187,7 +187,7 @@ int main( int argc, char *argv[] )
 		}
 	}
 	
-	// 下面准备下载
+	// 下载准备
 	printf( _("Initializing download: %s\n"), s );
 	if( do_search )
 	{
@@ -245,7 +245,10 @@ int main( int argc, char *argv[] )
 		memset( search, 0, sizeof( search_t ) * ( argc - optind ) );
 		for( i = 0; i < ( argc - optind ); i ++ )
 			strncpy( search[i].url, argv[optind+i], MAX_STRING );
-		axel = axel_new( conf, argc - optind, search );
+		// 如有必要，可以在这儿添加测速功能...
+		// j = search_getspeeds( search, argc-optind );
+		// search_sortlist( search, argc-optind );
+		axel = axel_new( conf, argc - optind, search );// argc-optind -> j
 		free( search );
 		if( axel->ready == -1 )
 		{
@@ -327,7 +330,7 @@ int main( int argc, char *argv[] )
 		return( 1 );
 	}
 	print_messages( axel );
-	axel_start( axel );
+	axel_start( axel );//headers
 	print_messages( axel );
 
 	if( conf->alternate_output )
@@ -350,9 +353,10 @@ int main( int argc, char *argv[] )
 	
 	while( !axel->ready && run )
 	{
-		long long int prev, done;
+		long long int prev;
 		
 		prev = axel->bytes_done;
+
 		axel_do( axel ); // 真正下载数据的地方
 		
 		if( conf->alternate_output )
@@ -363,30 +367,7 @@ int main( int argc, char *argv[] )
 		else
 		{
 			/* The infamous wget-like 'interface'.. ;)		*/
-			done = ( axel->bytes_done / 1024 ) - ( prev / 1024 );
-			if( done && conf->verbose > -1 )
-			{
-				for( i = 0; i < done; i ++ )
-				{
-					i += ( prev / 1024 );
-					if( ( i % 50 ) == 0 )
-					{
-						if( prev >= 1024 )
-							printf( "  [%6.1fKB/s]", (double) axel->bytes_per_second / 1024 );
-						if( axel->size < 10240000 )
-							printf( "\n[%3lld%%]  ", min( 100, 102400 * i / axel->size ) );
-						else
-							printf( "\n[%3lld%%]  ", min( 100, i / ( axel->size / 102400 ) ) );
-					}
-					else if( ( i % 10 ) == 0 )
-					{
-						putchar( ' ' );
-					}
-					putchar( '.' );
-					i -= ( prev / 1024 );
-				}
-				fflush( stdout );
-			}
+			// no use, I deleted it :)
 		}
 		
 		if( axel->message )

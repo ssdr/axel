@@ -314,6 +314,7 @@ int conn_info( conn_t *conn )
 		char s[MAX_STRING], *t;
 		long long int i = 0;
 		
+		// 循环跳转
 		do
 		{
 			conn->currentbyte = 1;

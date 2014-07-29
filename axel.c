@@ -141,6 +141,7 @@ int axel_open( axel_t *axel )
 	
 	if( axel->conf->verbose > 0 )
 		axel_message( axel, _("Opening output file %s"), axel->filename );
+
 	snprintf( buffer, MAX_STRING, "%s.st", axel->filename );
 	
 	axel->outfd = -1;
@@ -192,8 +193,8 @@ int axel_open( axel_t *axel )
 		}
 		
 		/* And check whether the filesystem can handle seeks to
-		   past-EOF areas.. Speeds things up. :) AFAIK this
-		   should just not happen:				*/
+		   past-EOF areas.. Speeds things up. :) 
+		   AFAIK(As Far As I Know) this should just not happen:				*/
 		if( lseek( axel->outfd, axel->size, SEEK_SET ) == -1 && axel->conf->num_connections > 1 )
 		{
 			/* But if the OS/fs does not allow to seek behind
@@ -503,8 +504,10 @@ void save_state( axel_t *axel )
 
 	/* No use for such a file if the server doesn't support
 	   resuming anyway..						*/
-	if( !axel->conn[0].supported )
+	if( !axel->conn[0].supported ) {
+		axel_message( axel, _("The server doesn't support resuming!!! --added by liuyan") );
 		return;
+	}
 	
 	snprintf( fn, MAX_STRING, "%s.st", axel->filename );
 	if( ( fd = open( fn, O_CREAT | O_TRUNC | O_WRONLY, 0666 ) ) == -1 )
