@@ -329,6 +329,14 @@ int main( int argc, char *argv[] )
 		}
 	}
 	
+	/*
+	 * main process:
+	 * axel_new()
+	 * axel_open()
+	 * axel_start() : setup_thread()
+	 * signal SIGINT/SIGTERM
+	 * while{ axel_do()}
+	 */
 	// 打开文件（状态文件、数据文件）
 	if( !axel_open( axel ) )
 	{
@@ -354,13 +362,13 @@ int main( int argc, char *argv[] )
 		// add by liuyan - 判断超时
 		if( gettime() - axel->start_time > conf->max_time )
 		{
-			printf(_("\nTime's up! Download incomplete!\n"));
+			printf(_("\nTime's up (max_time=%ds) ! Download Incomplete!\n"), conf->max_time);
+			axel->ready = 0;
 			run = 0;
-			continue;
+			break;
 		}
 
 		long long int prev;
-		
 		prev = axel->bytes_done;
 
 		axel_do( axel ); // 真正下载数据的地方
@@ -375,9 +383,8 @@ int main( int argc, char *argv[] )
 		{
 			if(conf->alternate_output==1)
 			{
-				/* clreol-simulation */
 				putchar( '\r' );
-				for( i = 0; i < 79; i++ ) /* linewidth known? */
+				for( i = 0; i < 79; i++ ) 
 					putchar( ' ' );
 				putchar( '\r' );
 			}
@@ -395,7 +402,7 @@ int main( int argc, char *argv[] )
 	
 	strcpy( string + MAX_STRING / 2,
 		size_human( axel->bytes_done - axel->start_byte ) );
-	if( axel->ready)
+	if( axel->ready && run )
 	{
 		printf( _("\nSuccessfully Downloaded %s in %s. (%.2f KB/s)\n"),
 			string + MAX_STRING / 2,
@@ -417,6 +424,7 @@ int main( int argc, char *argv[] )
 /* SIGINT/SIGTERM handler						*/
 void stop( int signal )
 {
+	printf(_("catch a signal!\n"));
 	run = 0;
 }
 
@@ -467,7 +475,15 @@ static void print_alternate_output(axel_t *axel)
 		if(axel->conn[i].currentbyte<axel->conn[i].lastbyte)
 		{
 			if(now <= axel->conn[i].last_transfer + axel->conf->connection_timeout/2 )
-				putchar(i+'0');
+			{
+				// 0-9;A-Z;a-z
+				if(i<10)
+					putchar(i+'0');//0-9
+				else if(i<36)
+					putchar(i+7+'0');//A-Z
+				else
+					putchar(i+13+'0');//a-z...
+			}
 			else
 				putchar('#');
 		} else 
