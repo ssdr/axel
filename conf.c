@@ -89,6 +89,8 @@ int conf_loadfile( conf_t *conf, char *file )
 		get_config_number( max_speed );
 		get_config_number( verbose );
 		get_config_number( alternate_output );
+		// add by liuyan
+		get_config_number( max_time);
 		
 		get_config_number( search_timeout );
 		get_config_number( search_threads );
@@ -134,8 +136,10 @@ int conf_init( conf_t *conf )
 	conf->num_connections		= 4;
 	conf->buffer_size		= 5120;
 	conf->max_speed			= 0;
-	conf->verbose			= 1;//-1;
-	conf->alternate_output		= 0;
+	conf->verbose			= -1;
+	conf->alternate_output	= 0;
+	// add by liuyan
+	conf->max_time			= 60;
 	
 	conf->search_timeout		= 10;
 	conf->search_threads		= 3;

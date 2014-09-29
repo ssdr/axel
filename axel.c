@@ -24,7 +24,6 @@
 */
 
 #include "axel.h"
-
 /* Axel */
 static void save_state( axel_t *axel );
 static void *setup_thread( void * );
@@ -70,6 +69,7 @@ axel_t *axel_new( conf_t *conf, int count, void *url )
 	{
 		res = (search_t *) url;
 		u = axel->url = malloc( sizeof( url_t ) );
+		// 循环链起来~
 		for( i = 0; i < count; i ++ )
 		{
 			strncpy( u->text, res[i].url, MAX_STRING );
@@ -142,6 +142,7 @@ int axel_open( axel_t *axel )
 	if( axel->conf->verbose > 0 )
 		axel_message( axel, _("Opening output file %s"), axel->filename );
 
+	// 读取状态文件
 	snprintf( buffer, MAX_STRING, "%s.st", axel->filename );
 	
 	axel->outfd = -1;
@@ -158,6 +159,7 @@ int axel_open( axel_t *axel )
 	}
 	else if( ( fd = open( buffer, O_RDONLY ) ) != -1 )
 	{
+		// 连接数
 		read( fd, &axel->conf->num_connections, sizeof( axel->conf->num_connections ) );
 		
 		axel->conn = realloc( axel->conn, sizeof( conn_t ) * axel->conf->num_connections );
@@ -165,7 +167,9 @@ int axel_open( axel_t *axel )
 
 		axel_divide( axel );
 		
+		// 总共已下载字节数
 		read( fd, &axel->bytes_done, sizeof( axel->bytes_done ) );
+		// 每个连接已下载的字节数
 		for( i = 0; i < axel->conf->num_connections; i ++ )
 			read( fd, &axel->conn[i].currentbyte, sizeof( axel->conn[i].currentbyte ) );
 
@@ -174,6 +178,7 @@ int axel_open( axel_t *axel )
 		
 		close( fd );
 		
+		// 打开数据文件
 		if( ( axel->outfd = open( axel->filename, O_WRONLY, 0666 ) ) == -1 )
 		{
 			axel_message( axel, _("Error opening local file") );
@@ -181,11 +186,13 @@ int axel_open( axel_t *axel )
 		}
 	}
 
+	// 状态文件不存在或打开失败, 从新下载
 	/* If outfd == -1 we have to start from scrath now		*/
 	if( axel->outfd == -1 )
 	{
 		axel_divide( axel );
 		
+		// 打开（创建）数据文件
 		if( ( axel->outfd = open( axel->filename, O_CREAT | O_WRONLY, 0666 ) ) == -1 )
 		{
 			axel_message( axel, _("Error opening local file") );
@@ -311,6 +318,7 @@ void axel_do( axel_t *axel )
 	{
 		axel->conn[i].last_transfer = gettime();
 		size = read( axel->conn[i].fd, buffer, axel->conf->buffer_size );
+		/* socket error */
 		if( size == -1 )
 		{
 			if( axel->conf->verbose )
@@ -322,6 +330,7 @@ void axel_do( axel_t *axel )
 			conn_disconnect( &axel->conn[i] );
 			continue;
 		}
+		/* connection close */
 		else if( size == 0 )
 		{
 			if( axel->conf->verbose )
@@ -344,6 +353,7 @@ void axel_do( axel_t *axel )
 			conn_disconnect( &axel->conn[i] );
 			continue;
 		}
+		/* real read bytes */
 		/* remaining == Bytes to go					*/
 		remaining = axel->conn[i].lastbyte - axel->conn[i].currentbyte + 1;
 		if( remaining < size )

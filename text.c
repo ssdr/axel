@@ -22,13 +22,11 @@
   if not, write to the Free Software Foundation, Inc., 59 Temple Place,
   Suite 330, Boston, MA  02111-1307  USA
 */
-
 #include "axel.h"
 
 static void stop( int signal );
 static char *size_human( long long int value );
 static char *time_human( int value );
-static void print_commas( long long int bytes_done );
 static void print_alternate_output( axel_t *axel );
 static void print_help();
 static void print_version();
@@ -52,6 +50,7 @@ static struct option axel_options[] =
 	{ "help",		0,	NULL,	'h' },
 	{ "version",		0,	NULL,	'V' },
 	{ "alternate",		0,	NULL,	'a' },
+	{ "max-time",	1,	NULL,	'm'	},	// add by liuyan
 	{ "header",		1,	NULL,	'H' },
 	{ "user-agent",		1,	NULL,	'U' },
 	{ NULL,			0,	NULL,	0 }
@@ -90,7 +89,7 @@ int main( int argc, char *argv[] )
 	{
 		int option;
 		
-		option = getopt_long( argc, argv, "s:n:o:S::NqvhVaH:U:", axel_options, NULL );
+		option = getopt_long( argc, argv, "s:n:o:S::NqvhVam:H:U:", axel_options, NULL );
 		if( option == -1 )
 			break;
 		
@@ -101,6 +100,13 @@ int main( int argc, char *argv[] )
 			break;
 		case 'H':
 			strncpy( conf->add_header[cur_head++], optarg, MAX_STRING );
+			break;
+		case 'm': // add by liuyan
+			if( !sscanf( optarg, "%i", &conf->max_time ) )
+			{
+				print_help();
+				return( 1 );
+			}
 			break;
 		case 's':
 			if( !sscanf( optarg, "%i", &conf->max_speed ) )
@@ -217,7 +223,7 @@ int main( int argc, char *argv[] )
 				printf( "%-70.70s %5i\n", search[i].url, search[i].speed );
 			printf( "\n" );
 		}
-		// 要下载咯
+		// 搜索下载模式
 		axel = axel_new( conf, j, search );
 		free( search );
 		if( axel->ready == -1 )
@@ -323,7 +329,7 @@ int main( int argc, char *argv[] )
 		}
 	}
 	
-	// 开始下载
+	// 打开文件（状态文件、数据文件）
 	if( !axel_open( axel ) )
 	{
 		print_messages( axel );
@@ -337,14 +343,6 @@ int main( int argc, char *argv[] )
 	{
 		putchar('\n');
 	} 
-	else
-	{
-		if( axel->bytes_done > 0 )	/* Print first dots if resuming	*/
-		{
-			putchar( '\n' );
-			print_commas( axel->bytes_done );
-		}
-	}
 	axel->start_byte = axel->bytes_done;
 	
 	/* Install save_state signal handler for resuming support	*/
@@ -353,6 +351,14 @@ int main( int argc, char *argv[] )
 	
 	while( !axel->ready && run )
 	{
+		// add by liuyan - 判断超时
+		if( gettime() - axel->start_time > conf->max_time )
+		{
+			printf(_("\nTime's up! Download incomplete!\n"));
+			run = 0;
+			continue;
+		}
+
 		long long int prev;
 		
 		prev = axel->bytes_done;
@@ -363,11 +369,6 @@ int main( int argc, char *argv[] )
 		{			
 			if( !axel->message && prev != axel->bytes_done )
 				print_alternate_output( axel );
-		}
-		else
-		{
-			/* The infamous wget-like 'interface'.. ;)		*/
-			// no use, I deleted it :)
 		}
 		
 		if( axel->message )
@@ -385,13 +386,6 @@ int main( int argc, char *argv[] )
 				putchar( '\n' );
 			}
 			print_messages( axel );
-			if( !axel->ready )
-			{
-				if(conf->alternate_output!=1)
-					print_commas( axel->bytes_done );
-				else
-					print_alternate_output(axel);
-			}
 		}
 		else if( axel->ready )
 		{
@@ -401,12 +395,18 @@ int main( int argc, char *argv[] )
 	
 	strcpy( string + MAX_STRING / 2,
 		size_human( axel->bytes_done - axel->start_byte ) );
-	
-	printf( _("\nDownloaded %s in %s. (%.2f KB/s)\n"),
-		string + MAX_STRING / 2,
-		time_human( gettime() - axel->start_time ),
-		(double) axel->bytes_per_second / 1024 );
-	
+	if( axel->ready)
+	{
+		printf( _("\nSuccessfully Downloaded %s in %s. (%.2f KB/s)\n"),
+			string + MAX_STRING / 2,
+			time_human( gettime() - axel->start_time ),
+			(double) axel->bytes_per_second / 1024 );
+	}
+	else
+	{
+		printf(_("\nDownload Failed.\n"));
+	}
+		
 	i = axel->ready ? 0 : 2;
 	
 	axel_close( axel );
@@ -448,24 +448,6 @@ char *time_human( int value )
 		sprintf( string, _("%i:%02i:%02i seconds"), value / 3600, ( value / 60 ) % 60, value % 60 );
 	
 	return( string );
-}
-
-/* Part of the infamous wget-like interface. Just put it in a function
-	because I need it quite often..					*/
-void print_commas( long long int bytes_done )
-{
-	int i, j;
-	
-	printf( "       " );
-	j = ( bytes_done / 1024 ) % 50;
-	if( j == 0 ) j = 50;
-	for( i = 0; i < j; i ++ )
-	{
-		if( ( i % 10 ) == 0 )
-			putchar( ' ' );
-		putchar( ',' );
-	}
-	fflush( stdout );
 }
 
 static void print_alternate_output(axel_t *axel) 
@@ -537,6 +519,7 @@ void print_help()
 		"-q\tLeave stdout alone\n"
 		"-v\tMore status information\n"
 		"-a\tAlternate progress indicator\n"
+		"-m x\tMaximum time in seconds that allows the whole operation to take\n"
 		"-h\tThis information\n"
 		"-V\tVersion information\n"
 		"\n"
@@ -554,6 +537,7 @@ void print_help()
 		"--quiet\t\t\t-q\tLeave stdout alone\n"
 		"--verbose\t\t-v\tMore status information\n"
 		"--alternate\t\t-a\tAlternate progress indicator\n"
+		"--max-time=x\t\t-m x\tMaximum time in seconds that allows the whole operation to take\n"
 		"--help\t\t\t-h\tThis information\n"
 		"--version\t\t-V\tVersion information\n"
 		"\n"
@@ -564,7 +548,7 @@ void print_help()
 void print_version()
 {
 	printf( _("Axel version %s (%s)\n"), AXEL_VERSION_STRING, ARCH );
-	printf( "\nCopyright 2001-2002 Wilmer van der Gaast.\n" );
+	printf( "\nCopyright 2014 www.ifeng.com\n" );
 }
 
 /* Print any message in the axel structure				*/
