@@ -275,8 +275,10 @@ void axel_do( axel_t *axel )
 	int hifd, i;
 	long long int remaining,size;
 	struct timeval timeval[1];
+	int rev;
 	
 	/* Create statefile if necessary				*/
+	// 防止系统crash来不及写，每10s写一次状态文件，感觉没有必要
 	if( gettime() > axel->next_state )
 	{
 		save_state( axel );
@@ -295,6 +297,7 @@ void axel_do( axel_t *axel )
 	if( hifd == 0 )
 	{
 		/* No connections yet. Wait...				*/
+		//printf(_("timestamp : %ld\n"), (long)gettime());
 		usleep( 100000 );
 		goto conn_check;
 	}
@@ -304,7 +307,8 @@ void axel_do( axel_t *axel )
 		timeval->tv_usec = 100000;
 		/* A select() error probably means it was interrupted
 		   by a signal, or that something else's very wrong...	*/
-		if( select( hifd + 1, fds, NULL, NULL, timeval ) == -1 )
+		rev = select( hifd + 1, fds, NULL, NULL, timeval );
+		if( rev == -1 )
 		{
 			axel->ready = -1;
 			return;
@@ -381,6 +385,7 @@ void axel_do( axel_t *axel )
 	}
 	else
 	{
+		// connection_timeout = 45s
 		if( gettime() > axel->conn[i].last_transfer + axel->conf->connection_timeout )
 		{
 			if( axel->conf->verbose )
@@ -425,6 +430,7 @@ conn_check:
 			}
 			else
 			{
+				// reconnect_delay = 20s
 				if( gettime() > axel->conn[i].last_transfer + axel->conf->reconnect_delay )
 				{
 					pthread_cancel( *axel->conn[i].setup_thread );

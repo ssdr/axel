@@ -25,10 +25,14 @@
 
 #include "axel.h"
 
+int axel_gethostbyname(const char *hostname, struct hostent *hostinfo);
+
 /* Get a TCP connection */
 int tcp_connect( char *hostname, int port, char *local_if )
 {
-	struct hostent *host = NULL;
+	struct hostent host[1];
+	memset(host, 0, sizeof(struct hostent));
+	//struct hostent *host = NULL;
 	struct sockaddr_in addr;
 	struct sockaddr_in local;
 	int fd;
@@ -43,15 +47,18 @@ int tcp_connect( char *hostname, int port, char *local_if )
 	   At least it very rarely does, on my system...		*/
 	for( fd = 0; fd < 5; fd ++ )
 	{
-		if( ( host = gethostbyname( hostname ) ) == NULL )
+		// gethostbyname is obsolete, we use axel_gethostbyname instead
+		if( axel_gethostbyname( hostname, host ) )
 			return( -1 );
 		if( *host->h_name ) break;
 	}
-	if( !host || !host->h_name || !*host->h_name )
+	if( !host->h_name || !*host->h_name )
 		return( -1 );
 	
 	if( ( fd = socket( AF_INET, SOCK_STREAM, 0 ) ) == -1 )
+	{
 		return( -1 );
+	}
 	
 	if( local_if && *local_if )
 	{
@@ -68,7 +75,7 @@ int tcp_connect( char *hostname, int port, char *local_if )
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons( port );
 	addr.sin_addr = *( (struct in_addr *) host->h_addr );
-	
+
 	if( connect( fd, (struct sockaddr *) &addr, sizeof( struct sockaddr_in ) ) == -1 )
 	{
 		close( fd );
@@ -103,3 +110,37 @@ int get_if_ip( char *iface, char *ip )
 		return( 0 );
 	}
 }
+
+int axel_gethostbyname(const char *hostname, struct hostent *hostinfo )
+{
+	char    buf[1024];
+	struct  hostent  *phost;
+	int     ret;
+
+	if( !hostinfo )
+		return( 1 );
+
+	if( gethostbyname_r(hostname, hostinfo, buf, sizeof(buf), &phost, &ret) ) {
+		fprintf( stderr, "ERROR : gethostbyname_r(%s) returns %d\n", hostname, ret);
+		return( 1 );
+	}
+	else {
+		printf("SUCCESS : gethostbyname_r(%s) returns %d,", hostname , ret);
+		if(phost) {
+			printf("[hostent] name:%s,addrtype:%d(AF_INET:%d),len:%d\n",
+					phost->h_name,phost->h_addrtype,AF_INET,phost->h_length);
+		}
+
+/*
+		int i;
+		for(i = 0;hostinfo->h_aliases[i];i++) {
+			printf("hostinfo alias%d is:%s\n", i, hostinfo->h_aliases[i]);
+		}
+		for(i = 0;hostinfo->h_addr_list[i];i++) {
+			printf("host addr%d is:%s\n", i, inet_ntoa(*(struct in_addr*)hostinfo->h_addr_list[i]));
+		}
+*/
+		return( 0 );
+	}
+}
+
