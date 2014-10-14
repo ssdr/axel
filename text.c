@@ -60,7 +60,14 @@ static struct option axel_options[] =
 /* For returning string values from functions				*/
 static char string[MAX_STRING];
 
-
+/*
+ * main process:
+ * axel_new()
+ * axel_open()
+ * axel_start() : setup_thread()
+ * signal SIGINT/SIGTERM
+ * while{ axel_do()}
+ */
 int main( int argc, char *argv[] )
 {
 	char fn[MAX_STRING] = "";
@@ -328,15 +335,7 @@ int main( int argc, char *argv[] )
 			i ++;
 		}
 	}
-	
-	/*
-	 * main process:
-	 * axel_new()
-	 * axel_open()
-	 * axel_start() : setup_thread()
-	 * signal SIGINT/SIGTERM
-	 * while{ axel_do()}
-	 */
+		
 	// 打开文件（状态文件、数据文件）
 	if( !axel_open( axel ) )
 	{

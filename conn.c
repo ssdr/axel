@@ -34,6 +34,7 @@ int conn_set( conn_t *conn, char *set_url )
 	char *i, *j;
 	
 	/* protocol://							*/
+	// 如果不带协议，默认是FTP，改成HTTP
 	if( ( i = strstr( set_url, "://" ) ) == NULL )
 	{
 		conn->proto = PROTO_DEFAULT;
@@ -47,7 +48,7 @@ int conn_set( conn_t *conn, char *set_url )
 			conn->proto = PROTO_HTTP;
 		else
 		{
-			return( 0 );
+			return( 0 );// 不支持其他协议
 		}
 		strncpy( url, i + 3, MAX_STRING );
 	}
@@ -359,8 +360,12 @@ int conn_info( conn_t *conn )
 		}
 		else if( conn->http->status == 200 || conn->http->status == 206 )
 		{
-			conn->supported = 0;
-			conn->size = INT_MAX;
+			// 在限速的情况下，此处如果supported设为0的话只能起一个线程
+			// 这里为了不限速(添加unlimit参数)，supported改为1
+			// added by liuyan
+			conn->supported = 1;
+			//conn->supported = 0;
+			//conn->size = INT_MAX;
 		}
 		else
 		{

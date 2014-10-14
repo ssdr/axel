@@ -25,7 +25,8 @@
 
 #define PROTO_FTP	1
 #define PROTO_HTTP	2
-#define PROTO_DEFAULT	PROTO_FTP
+//#define PROTO_DEFAULT	PROTO_FTP
+#define PROTO_DEFAULT	PROTO_HTTP
 
 typedef struct
 {

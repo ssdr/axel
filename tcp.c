@@ -47,7 +47,7 @@ int tcp_connect( char *hostname, int port, char *local_if )
 	   At least it very rarely does, on my system...		*/
 	for( fd = 0; fd < 5; fd ++ )
 	{
-		// gethostbyname is obsolete, we use axel_gethostbyname instead
+		// gethostbyname is obsolete, we use gethostbyname_r instead
 		if( axel_gethostbyname( hostname, host ) )
 			return( -1 );
 		if( *host->h_name ) break;
@@ -124,14 +124,13 @@ int axel_gethostbyname(const char *hostname, struct hostent *hostinfo )
 		fprintf( stderr, "ERROR : gethostbyname_r(%s) returns %d\n", hostname, ret);
 		return( 1 );
 	}
+/*
 	else {
 		printf("SUCCESS : gethostbyname_r(%s) returns %d,", hostname , ret);
 		if(phost) {
 			printf("[hostent] name:%s,addrtype:%d(AF_INET:%d),len:%d\n",
 					phost->h_name,phost->h_addrtype,AF_INET,phost->h_length);
 		}
-
-/*
 		int i;
 		for(i = 0;hostinfo->h_aliases[i];i++) {
 			printf("hostinfo alias%d is:%s\n", i, hostinfo->h_aliases[i]);
@@ -139,8 +138,9 @@ int axel_gethostbyname(const char *hostname, struct hostent *hostinfo )
 		for(i = 0;hostinfo->h_addr_list[i];i++) {
 			printf("host addr%d is:%s\n", i, inet_ntoa(*(struct in_addr*)hostinfo->h_addr_list[i]));
 		}
-*/
-		return( 0 );
 	}
+*/
+
+	return( 0 );
 }
 

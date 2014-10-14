@@ -242,6 +242,7 @@ void axel_start( axel_t *axel )
 	if( axel->conf->verbose > 0 )
 		axel_message( axel, _("Starting download") );
 	
+	// before start threads, we get gethostbyname firstly...
 	for( i = 0; i < axel->conf->num_connections; i ++ )
 	if( axel->conn[i].currentbyte <= axel->conn[i].lastbyte )
 	{
@@ -297,7 +298,6 @@ void axel_do( axel_t *axel )
 	if( hifd == 0 )
 	{
 		/* No connections yet. Wait...				*/
-		//printf(_("timestamp : %ld\n"), (long)gettime());
 		usleep( 100000 );
 		goto conn_check;
 	}
@@ -518,8 +518,7 @@ void save_state( axel_t *axel )
 	int fd, i;
 	char fn[MAX_STRING+4];
 
-	/* No use for such a file if the server doesn't support
-	   resuming anyway..						*/
+	/* No use for such a file if the server doesn't support resuming anyway..	*/
 	if( !axel->conn[0].supported ) {
 		axel_message( axel, _("The server doesn't support resuming!!! --added by liuyan") );
 		return;
