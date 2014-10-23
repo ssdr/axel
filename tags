@@ -4,25 +4,31 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
+ARCH	config.h	6;"	d
 AXEL_VERSION_STRING	axel.h	70;"	d
 DEFAULT_USER_AGENT	axel.h	71;"	d
+ETCDIR	config.h	4;"	d
+FREE	tcp.c	28;"	d	file:
 FTP_PASSIVE	ftp.h	26;"	d
 FTP_PORT	ftp.h	27;"	d
+LOCALE	config.h	5;"	d
 MAX_ADD_HEADERS	axel.h	68;"	d
 MAX_QUERY	http.h	26;"	d
 MAX_REDIR	axel.h	69;"	d
 MAX_STRING	axel.h	67;"	d
 MOFILES	Makefile	/^MOFILES = nl.mo de.mo ru.mo zh_CN.mo$/;"	m
 PACKAGE	axel.h	58;"	d
-PROTO_DEFAULT	conn.h	28;"	d
+PROTO_DEFAULT	conn.h	29;"	d
 PROTO_FTP	conn.h	26;"	d
 PROTO_HTTP	conn.h	27;"	d
-SPEED_ACTIVE	search.c	162;"	d	file:
-SPEED_DONE	search.c	164;"	d	file:
-SPEED_ERROR	search.c	163;"	d	file:
+SPEED_ACTIVE	search.c	169;"	d	file:
+SPEED_DONE	search.c	171;"	d	file:
+SPEED_ERROR	search.c	170;"	d	file:
 _	axel.h	59;"	d
 _	axel.h	63;"	d
 _GNU_SOURCE	axel.h	35;"	d
+_REENTRANT	config.h	2;"	d
+_THREAD_SAFE	config.h	3;"	d
 add_header	conf.h	/^	char add_header[MAX_ADD_HEADERS][MAX_STRING];$/;"	m	struct:__anon5
 add_header_count	conf.h	/^	int add_header_count;$/;"	m	struct:__anon5
 alternate_output	conf.h	/^	int alternate_output;$/;"	m	struct:__anon5
@@ -86,11 +92,12 @@ ftp_wait	ftp.c	/^int ftp_wait( ftp_t *conn )$/;"	f
 get_config_number	conf.c	35;"	d	file:
 get_config_string	conf.c	29;"	d	file:
 get_if_ip	tcp.c	/^int get_if_ip( char *iface, char *ip )$/;"	f
-getopt_long	text.c	40;"	d	file:
+getopt_long	text.c	38;"	d	file:
 gettime	axel.c	/^double gettime()$/;"	f
 headers	http.h	/^	char headers[MAX_QUERY];$/;"	m	struct:__anon4
 host	conn.h	/^	char host[MAX_STRING];$/;"	m	struct:__anon7
 host	http.h	/^	char host[MAX_STRING];$/;"	m	struct:__anon4
+host2addr	tcp.c	/^int host2addr(const char *host, struct in_addr *addr, char *buff) {$/;"	f
 http	conn.h	/^	http_t http[1];$/;"	m	struct:__anon7
 http_addheader	http.c	/^void http_addheader( http_t *conn, char *format, ... )$/;"	f
 http_connect	http.c	/^int http_connect( http_t *conn, int proto, char *proxy, char *host, int port, char *user, char *pass )$/;"	f
@@ -115,6 +122,7 @@ main	search.c	/^int main( int argc, char *argv[] )$/;"	f
 main	text.c	/^int main( int argc, char *argv[] )$/;"	f
 max	axel.h	90;"	d
 max_speed	conf.h	/^	int max_speed;$/;"	m	struct:__anon5
+max_time	conf.h	/^	int max_time;$/;"	m	struct:__anon5
 message	axel.h	/^	message_t *message;$/;"	m	struct:__anon2
 message	conn.h	/^	char *message;$/;"	m	struct:__anon7
 message	ftp.h	/^	char *message;$/;"	m	struct:__anon3
@@ -130,7 +138,6 @@ parse_interfaces	conf.c	/^int parse_interfaces( conf_t *conf, char *s )$/;"	f
 pass	conn.h	/^	char pass[MAX_STRING];$/;"	m	struct:__anon7
 port	conn.h	/^	int port;$/;"	m	struct:__anon7
 print_alternate_output	text.c	/^static void print_alternate_output(axel_t *axel) $/;"	f	file:
-print_commas	text.c	/^void print_commas( long long int bytes_done )$/;"	f
 print_help	text.c	/^void print_help()$/;"	f
 print_messages	text.c	/^void print_messages( axel_t *axel )$/;"	f
 print_version	text.c	/^void print_version()$/;"	f
@@ -146,6 +153,7 @@ save_state	axel.c	/^void save_state( axel_t *axel )$/;"	f
 save_state_interval	conf.h	/^	int save_state_interval;$/;"	m	struct:__anon5
 search_amount	conf.h	/^	int search_amount;$/;"	m	struct:__anon5
 search_getspeeds	search.c	/^int search_getspeeds( search_t *results, int count )$/;"	f
+search_getspeeds2	search.c	/^int search_getspeeds2( search_t *results, int count )$/;"	f
 search_makelist	search.c	/^int search_makelist( search_t *results, char *url )$/;"	f
 search_sortlist	search.c	/^void search_sortlist( search_t *results, int count )$/;"	f
 search_sortlist_qsort	search.c	/^int search_sortlist_qsort( const void *a, const void *b )$/;"	f

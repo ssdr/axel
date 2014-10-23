@@ -562,8 +562,12 @@ void print_help()
 
 void print_version()
 {
-	printf( _("Axel version %s (%s)\n"), AXEL_VERSION_STRING, ARCH );
-	printf( "\nCopyright 2014 www.ifeng.com\n" );
+	printf( "\nAxel v1.0 support :\n"
+		 "1, -m 最大下载时间;\n"
+		 "2, 支持unlimit=1请求参数;\n" );
+
+	printf( _("\nAxel version %s (%s)\n"), AXEL_VERSION_STRING, ARCH );
+	printf( "Copyright 2014 www.ifeng.com\n" );
 }
 
 /* Print any message in the axel structure				*/
