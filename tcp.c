@@ -25,16 +25,10 @@
 
 #include "axel.h"
 
-#define FREE(X) if(X!=NULL) \
-				   free(X)
-
-int host2addr(const char *host, struct in_addr *addr, char *buff);
-
 /* Get a TCP connection */
 int tcp_connect( char *hostname, int port, char *local_if )
 {
 	struct sockaddr_in addr;
-	char *buff = NULL;
 	struct sockaddr_in local;
 	int fd;
 
@@ -43,21 +37,8 @@ int tcp_connect( char *hostname, int port, char *local_if )
 	fprintf( stderr, "tcp_connect( %s, %i ) = ", hostname, port );
 #endif
 
-	/* Why this loop? Because the call might return an empty record.
-	   At least it very rarely does, on my system...		*/
-	// host2addr()已经调用了多次，外部这个循环就不要了吧
-	for( fd = 0; fd < 1; fd ++ )
-	{
-		if( host2addr( hostname, &(addr.sin_addr), buff ) )
-		{
-			FREE(buff);
-			return( -1 );
-		}
-	}
-
 	if( ( fd = socket( AF_INET, SOCK_STREAM, 0 ) ) == -1 )
 	{		
-		FREE(buff);
 		return( -1 );
 	}
 
@@ -69,23 +50,21 @@ int tcp_connect( char *hostname, int port, char *local_if )
 		if( bind( fd, (struct sockaddr *) &local, sizeof( struct sockaddr_in ) ) == -1 )
 		{
 			close( fd );
-			FREE(buff);
 			return( -1 );
 		}
 	}
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons( port );
+	//inet_aton( hostname, &addr.sin_addr );// 不可重入
+	inet_pton( AF_INET, hostname, &addr.sin_addr );// 可重入版本
 
 	if( connect( fd, (struct sockaddr *) &addr, sizeof( struct sockaddr_in ) ) == -1 )
 	{
 		close( fd );
-		FREE(buff);
 		return( -1 );
 	}
 
-	// 释放动态申请的内存
-	FREE(buff);
 #ifdef DEBUG
 	getsockname( fd, &local, &i );
 	fprintf( stderr, "%i\n", ntohs( local.sin_port ) );
@@ -115,26 +94,4 @@ int get_if_ip( char *iface, char *ip )
 	}
 }
 
-int host2addr(const char *host, struct in_addr *addr, char *buff) {
-	struct hostent he, *result;
-	int herr, ret, bufsz = 512;
-	//char *buff = NULL;
-	do {
-		char *new_buff = (char *)realloc(buff, bufsz);
-		if (new_buff == NULL) {
-			free(buff);
-			return ENOMEM;
-		}   
-		buff = new_buff;
-		ret = gethostbyname_r(host, &he, buff, bufsz, &result, &herr);
-		bufsz *= 2;
-	} while (ret == ERANGE);
-
-	if (ret == 0 && result != NULL) 
-		*addr = *(struct in_addr *)he.h_addr;
-	else if (result != &he) 
-		ret = herr;
-	//free(buff);
-	return ret;
-}
 

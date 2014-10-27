@@ -6,9 +6,9 @@
 !_TAG_PROGRAM_VERSION	5.8	//
 ARCH	config.h	6;"	d
 AXEL_VERSION_STRING	axel.h	70;"	d
+DEBUG	config.h	8;"	d
 DEFAULT_USER_AGENT	axel.h	71;"	d
 ETCDIR	config.h	4;"	d
-FREE	tcp.c	28;"	d	file:
 FTP_PASSIVE	ftp.h	26;"	d
 FTP_PORT	ftp.h	27;"	d
 LOCALE	config.h	5;"	d
@@ -71,6 +71,7 @@ data_fd	ftp.h	/^	int data_fd;$/;"	m	struct:__anon3
 default_filename	conf.h	/^	char default_filename[MAX_STRING];$/;"	m	struct:__anon5
 delay_time	axel.h	/^	int delay_time;$/;"	m	struct:__anon2
 dir	conn.h	/^	char dir[MAX_STRING];$/;"	m	struct:__anon7
+dns_resolve	axel.c	/^static int dns_resolve(axel_t *axel, int count, void *url)$/;"	f	file:
 enabled	conn.h	/^	int enabled;$/;"	m	struct:__anon7
 fd	conn.h	/^	int fd;$/;"	m	struct:__anon7
 fd	ftp.h	/^	int fd;$/;"	m	struct:__anon3
@@ -97,7 +98,7 @@ gettime	axel.c	/^double gettime()$/;"	f
 headers	http.h	/^	char headers[MAX_QUERY];$/;"	m	struct:__anon4
 host	conn.h	/^	char host[MAX_STRING];$/;"	m	struct:__anon7
 host	http.h	/^	char host[MAX_STRING];$/;"	m	struct:__anon4
-host2addr	tcp.c	/^int host2addr(const char *host, struct in_addr *addr, char *buff) {$/;"	f
+host2addr	axel.c	/^static int host2addr(const char *host, struct in_addr *addr, char *buff) $/;"	f	file:
 http	conn.h	/^	http_t http[1];$/;"	m	struct:__anon7
 http_addheader	http.c	/^void http_addheader( http_t *conn, char *format, ... )$/;"	f
 http_connect	http.c	/^int http_connect( http_t *conn, int proto, char *proxy, char *host, int port, char *user, char *pass )$/;"	f

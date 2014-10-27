@@ -25,6 +25,9 @@
 
 #include "axel.h"
 
+static int host2addr(const char *host, struct in_addr *addr, char *buff);
+static int dns_resolve(axel_t *axel, int count, void *url);
+
 char string[MAX_STRING];
 
 /* Convert an URL to a conn_t structure					*/
@@ -33,6 +36,7 @@ int conn_set( conn_t *conn, char *set_url )
 	char url[MAX_STRING];
 	char *i, *j;
 	
+	// http://www.ifeng.com/video/path/to/file.mp4?unlimit=1
 	/* protocol://							*/
 	// 如果不带协议，默认是FTP，改成HTTP
 	if( ( i = strstr( set_url, "://" ) ) == NULL )
@@ -45,7 +49,7 @@ int conn_set( conn_t *conn, char *set_url )
 		if( set_url[0] == 'f' )
 			conn->proto = PROTO_FTP;
 		else if( set_url[0] == 'h' )
-			conn->proto = PROTO_HTTP;
+			conn->proto = PROTO_HTTP; //proto : http
 		else
 		{
 			return( 0 );// 不支持其他协议
@@ -53,6 +57,7 @@ int conn_set( conn_t *conn, char *set_url )
 		strncpy( url, i + 3, MAX_STRING );
 	}
 	
+	// www.ifeng.com/video/path/to/file.mp4?unlimit=1
 	/* Split							*/
 	if( ( i = strchr( url, '/' ) ) == NULL )
 	{
@@ -61,11 +66,11 @@ int conn_set( conn_t *conn, char *set_url )
 	else
 	{
 		*i = 0;
-		snprintf( conn->dir, MAX_STRING, "/%s", i + 1 );
+		snprintf( conn->dir, MAX_STRING, "/%s", i + 1 ); //dir
 		if( conn->proto == PROTO_HTTP )
 			http_encode( conn->dir );
 	}
-	strncpy( conn->host, url, MAX_STRING );
+	strncpy( conn->host, url, MAX_STRING ); //host : www.ifeng.com
 	j = strchr( conn->dir, '?' );
 	if( j != NULL )
 		*j = 0;
@@ -80,8 +85,8 @@ int conn_set( conn_t *conn, char *set_url )
 	}
 	else
 	{
-		strncpy( conn->file, i + 1, MAX_STRING );
-		strcat( conn->dir, "/" );
+		strncpy( conn->file, i + 1, MAX_STRING ); // file : file.mp4?unlimit=1
+		strcat( conn->dir, "/" ); // dir : /video/path/to/
 	}
 	
 	/* Check for username in host field				*/
@@ -124,6 +129,7 @@ int conn_set( conn_t *conn, char *set_url )
 	/* Take default port numbers from /etc/services			*/
 	else
 	{
+/*
 #ifndef DARWIN
 		struct servent *serv;
 		
@@ -136,10 +142,11 @@ int conn_set( conn_t *conn, char *set_url )
 			conn->port = ntohs( serv->s_port );
 		else
 #endif
-		if( conn->proto == PROTO_HTTP )
-			conn->port = 80;
-		else
+*/
+		if( conn->proto == PROTO_FTP )
 			conn->port = 21;
+		else
+			conn->port = 80;
 	}
 	
 	return( conn->port > 0 );
@@ -315,7 +322,7 @@ int conn_info( conn_t *conn )
 		char s[MAX_STRING], *t;
 		long long int i = 0;
 		
-		// 循环跳转
+		// redirections
 		do
 		{
 			conn->currentbyte = 1;
@@ -341,8 +348,10 @@ int conn_info( conn_t *conn )
 					conn->host, conn->port, s );
 				strncpy( s, conn->http->headers, MAX_STRING );
 			}
+
 			conn_set( conn, s );
 			i ++;
+			printf("***************** redirect : %s\n", s);
 		}
 		while( conn->http->status / 100 == 3 && i < MAX_REDIR );
 		
@@ -361,7 +370,7 @@ int conn_info( conn_t *conn )
 		else if( conn->http->status == 200 || conn->http->status == 206 )
 		{
 			// 在限速的情况下，此处如果supported设为0的话只能起一个线程
-			// 这里为了不限速(添加unlimit参数)，supported改为1
+			// 为了不限速(添加unlimit参数)，这里supported改为1
 			// added by liuyan
 			conn->supported = 1;
 			//conn->supported = 0;
@@ -379,4 +388,99 @@ int conn_info( conn_t *conn )
 	}
 	
 	return( 1 );
+}
+
+// 用于域名解析
+static int host2addr(const char *host, struct in_addr *addr, char *buff) 
+{
+	struct hostent he, *result;
+	int herr, ret, bufsz = 512;
+	// 清空下addr
+	//memset( addr, 0, sizeof(struct in_addr) );
+	do {
+		char *new_buff = (char *)realloc(buff, bufsz);
+		if (new_buff == NULL) {
+			free(buff);
+			return ENOMEM;
+		}   
+		buff = new_buff;
+		ret = gethostbyname_r(host, &he, buff, bufsz, &result, &herr);
+		bufsz *= 2;
+	} while (ret == ERANGE);
+
+	if (ret == 0 && result != NULL) 
+		*addr = *(struct in_addr *)he.h_addr;
+	else if (result != &he) 
+		ret = herr;
+	return ret;
+}
+
+// conns的作用是暂存host
+// 1, 通过conn_set获取conn->host
+// 2, 利用host做DNS解析得到ip
+// 3, 将url中的conn->host换成ip
+static int dns_resolve(axel_t *axel, int count, void *url)
+{
+	int i;
+	search_t *search;
+	conn_t *conns;
+	char *buff = NULL;
+	struct sockaddr_in addr;
+
+	// 兼容单源下载的情况，因为单源下载时count为0
+	// 单源下载：count:0, url:url_t
+	// 多源下载：count:>0, url:search_t
+	int cnt = count;
+	if( cnt == 0 ) {
+		cnt = 1;
+	} else {
+		search = ( search_t *) url;
+	}
+
+	conns = malloc( sizeof(conn_t) * cnt );
+	for( i = 0; i < cnt; i ++ )
+	{
+		conn_t *pconn = &conns[i];
+		char *myurl;
+		if(cnt==1)
+			myurl = (char*)url;
+		else
+			myurl = search[i].url;
+
+		// 解析url
+		if( !conn_set( pconn, myurl ) )
+		{
+			axel_message( axel, _("Could not parse URL[%d].\n"), i );
+			free( conns );
+			return( -1 );
+		}
+		// 解析DNS
+		if( host2addr( pconn->host, &(addr.sin_addr), buff ) )
+		{
+			axel_message( axel, _("Could not resove %s URL[%d].\n"), pconn->host, i );
+			free(buff);
+			free( conns );
+			return( -1 );
+		}
+		// redirect
+		if( !conn_info( pconn ) )
+		{
+			axel_message( axel, pconn->message );
+			free(buff);
+			free( conns );
+			return( -1 );
+		}
+		// ip替换host
+		char *ip = inet_ntoa( addr.sin_addr );
+		memset(myurl, 0, strlen(myurl));
+		snprintf(myurl, MAX_STRING, "http://%s:%i%s%s", ip, pconn->port, pconn->dir, pconn->file);
+		
+		//axel_message( axel, _("************** New URL: %s\n"), myurl );
+		printf( "************** New URL: %s\n", myurl );
+	}
+	free(buff);
+	free( conns );
+	// DNS解析完毕，hu~
+
+	return 0;
 }

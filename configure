@@ -14,7 +14,7 @@ mandir='$sharedir/man'
 locale='$sharedir/locale'
 
 i18n=0
-debug=0
+debug=1
 strip=0
 
 arch=`uname -s`

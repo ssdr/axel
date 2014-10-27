@@ -242,8 +242,8 @@ int main( int argc, char *argv[] )
 	}
 	else if( argc - optind == 1 )
 	{
-		// 单源直接下载,不搜索
-		axel = axel_new( conf, 0, s );
+		// 单源直接下载
+		axel = axel_new( conf, 0, s ); //s is url_t( i.e. char* )
 		if( axel->ready == -1 )
 		{
 			print_messages( axel );
@@ -253,7 +253,7 @@ int main( int argc, char *argv[] )
 	}
 	else
 	{
-		// 多源直接下载，不搜索
+		// 多源直接下载
 		search = malloc( sizeof( search_t ) * ( argc - optind ) );
 		memset( search, 0, sizeof( search_t ) * ( argc - optind ) );
 		for( i = 0; i < ( argc - optind ); i ++ )
@@ -261,7 +261,8 @@ int main( int argc, char *argv[] )
 		// 如有必要，可以在这儿添加测速功能...
 		// j = search_getspeeds( search, argc-optind );
 		// search_sortlist( search, argc-optind );
-		axel = axel_new( conf, argc - optind, search );// argc-optind -> j
+		// argc-optind -> j
+		axel = axel_new( conf, argc - optind, search ); // search is search_t
 		free( search );
 		if( axel->ready == -1 )
 		{
@@ -342,6 +343,8 @@ int main( int argc, char *argv[] )
 		print_messages( axel );
 		return( 1 );
 	}
+
+	printf("*******************before start\n");
 	print_messages( axel );
 	axel_start( axel );//headers
 	print_messages( axel );

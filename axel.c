@@ -33,6 +33,9 @@ static void axel_divide( axel_t *axel );
 static char *buffer = NULL;
 
 /* Create a new axel_t structure					*/
+// 这里面在要做的是将所有url中host经过DNS解析换成IP
+// 以后conn结构里面的host可以看做是DNS解析后的addr
+// 以后就不用在各个线程里面再做解析了:)
 axel_t *axel_new( conf_t *conf, int count, void *url )
 {
 	search_t *res;
@@ -46,6 +49,7 @@ axel_t *axel_new( conf_t *conf, int count, void *url )
 	*axel->conf = *conf;
 	axel->conn = malloc( sizeof( conn_t ) * axel->conf->num_connections );
 	memset( axel->conn, 0, sizeof( conn_t ) * axel->conf->num_connections );
+	// 限速
 	if( axel->conf->max_speed > 0 )
 	{
 		if( (float) axel->conf->max_speed / axel->conf->buffer_size < 0.5 )
@@ -54,10 +58,19 @@ axel_t *axel_new( conf_t *conf, int count, void *url )
 				axel_message( axel, _("Buffer resized for this speed.") );
 			axel->conf->buffer_size = axel->conf->max_speed;
 		}
-		axel->delay_time = (int) ( (float) 1000000 / axel->conf->max_speed * axel->conf->buffer_size * axel->conf->num_connections );
+		axel->delay_time = (int) ( (float) 1000000 / axel->conf->max_speed * 
+				axel->conf->buffer_size * axel->conf->num_connections );
 	}
 	if( buffer == NULL )
 		buffer = malloc( max( MAX_STRING, axel->conf->buffer_size ) );
+	
+	// 关于DNS解析，可以在这里做解析工作
+	/*if( dns_resolve(axel, count, url) == -1 )
+	{
+		axel->ready = -1;
+		return( axel );
+	}
+	*/
 	
 	if( count == 0 )
 	{
@@ -242,7 +255,6 @@ void axel_start( axel_t *axel )
 	if( axel->conf->verbose > 0 )
 		axel_message( axel, _("Starting download") );
 	
-	// before start threads, we get gethostbyname firstly...
 	for( i = 0; i < axel->conf->num_connections; i ++ )
 	if( axel->conn[i].currentbyte <= axel->conn[i].lastbyte )
 	{
@@ -608,3 +620,5 @@ static void axel_divide( axel_t *axel )
 	printf( "Downloading %lld-%lld using conn. %i\n", axel->conn[i-1].currentbyte, axel->conn[i-1].lastbyte, i - 1 );
 #endif
 }
+
+
