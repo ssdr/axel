@@ -5,4 +5,3 @@
 #define LOCALE "/usr/local/share/locale"
 #define ARCH "Linux"
 
-#define DEBUG

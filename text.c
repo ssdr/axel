@@ -258,10 +258,6 @@ int main( int argc, char *argv[] )
 		memset( search, 0, sizeof( search_t ) * ( argc - optind ) );
 		for( i = 0; i < ( argc - optind ); i ++ )
 			strncpy( search[i].url, argv[optind+i], MAX_STRING );
-		// 如有必要，可以在这儿添加测速功能...
-		// j = search_getspeeds( search, argc-optind );
-		// search_sortlist( search, argc-optind );
-		// argc-optind -> j
 		axel = axel_new( conf, argc - optind, search ); // search is search_t
 		free( search );
 		if( axel->ready == -1 )
@@ -344,9 +340,8 @@ int main( int argc, char *argv[] )
 		return( 1 );
 	}
 
-	printf("*******************before start\n");
 	print_messages( axel );
-	axel_start( axel );//headers
+	axel_start( axel );//
 	print_messages( axel );
 
 	if( conf->alternate_output )
@@ -565,6 +560,8 @@ void print_help()
 
 void print_version()
 {
+	printf( "\nAxel v1.1 support :\n"
+			"支持多源下载，之前除第一个源之外下载都是失败的:(\n");
 	printf( "\nAxel v1.0 support :\n"
 		 "1, -m 最大下载时间;\n"
 		 "2, 支持unlimit=1请求参数;\n" );

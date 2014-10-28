@@ -30,12 +30,11 @@ static void *setup_thread( void * );
 static void axel_message( axel_t *axel, char *format, ... );
 static void axel_divide( axel_t *axel );
 
+static int redirect(axel_t *axel, int count, void *url);
+
 static char *buffer = NULL;
 
 /* Create a new axel_t structure					*/
-// 这里面在要做的是将所有url中host经过DNS解析换成IP
-// 以后conn结构里面的host可以看做是DNS解析后的addr
-// 以后就不用在各个线程里面再做解析了:)
 axel_t *axel_new( conf_t *conf, int count, void *url )
 {
 	search_t *res;
@@ -47,6 +46,7 @@ axel_t *axel_new( conf_t *conf, int count, void *url )
 	axel = malloc( sizeof( axel_t ) );
 	memset( axel, 0, sizeof( axel_t ) );
 	*axel->conf = *conf;
+	// ***创建conn结构***
 	axel->conn = malloc( sizeof( conn_t ) * axel->conf->num_connections );
 	memset( axel->conn, 0, sizeof( conn_t ) * axel->conf->num_connections );
 	// 限速
@@ -64,13 +64,12 @@ axel_t *axel_new( conf_t *conf, int count, void *url )
 	if( buffer == NULL )
 		buffer = malloc( max( MAX_STRING, axel->conf->buffer_size ) );
 	
-	// 关于DNS解析，可以在这里做解析工作
-	/*if( dns_resolve(axel, count, url) == -1 )
+	// 处理3xx跳转工作
+	if( redirect(axel, count, url) == -1 )
 	{
 		axel->ready = -1;
 		return( axel );
 	}
-	*/
 	
 	if( count == 0 )
 	{
@@ -131,6 +130,7 @@ axel_t *axel_new( conf_t *conf, int count, void *url )
 		axel->ready = -1;
 		return( axel );
 	}
+	// 更改url
 	s = conn_url( axel->conn );
 	strncpy( axel->url->text, s, MAX_STRING );
 	if( ( axel->size = axel->conn[0].size ) != INT_MAX )
@@ -560,6 +560,7 @@ void *setup_thread( void *c )
 	pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, &oldstate );
 	pthread_setcanceltype( PTHREAD_CANCEL_ASYNCHRONOUS, &oldstate );
 	
+	//printf("*********************setup_thread create_thread()\n");
 	if( conn_setup( conn ) )
 	{
 		conn->last_transfer = gettime();
@@ -568,12 +569,14 @@ void *setup_thread( void *c )
 			conn->last_transfer = gettime();
 			conn->enabled = 1;
 			conn->state = 0;
+			//printf("**setup_thread success\n");
 			return( NULL );
 		}
 	}
 	
 	conn_disconnect( conn );
 	conn->state = 0;
+	//printf("**setup_thread fail\n");
 	return( NULL );
 }
 
@@ -621,4 +624,57 @@ static void axel_divide( axel_t *axel )
 #endif
 }
 
+// conns的作用是暂存host
+// 1, 通过conn_set获取conn->host
+// 2, 利用conn_info进行跳转
+// 3, 将url换成跳转后的地址
+static int redirect(axel_t *axel, int count, void *url)
+{
+	int i;
+	search_t *search;
+	conn_t *conns;
+	char *s;
 
+	// 兼容单源下载的情况，因为单源下载时count为0
+	// 单源下载：count:0, url:url_t
+	// 多源下载：count:>0, url:search_t
+	int cnt = count;
+	if( cnt == 0 ) {
+		cnt = 1;
+	} else {
+		search = ( search_t *) url;
+	}
+
+	conns = malloc( sizeof(conn_t) * cnt );
+	for( i = 0; i < cnt; i ++ )
+	{
+		conn_t *pconn = &conns[i];
+		pconn->conf = axel->conf;
+		char *myurl;
+		if(cnt==1)
+			myurl = (char*)url;
+		else
+			myurl = search[i].url;
+
+		// 解析url
+		if( !conn_set( pconn, myurl ) )
+		{
+			axel_message( axel, _("Could not parse URL[%d].\n"), i );
+			free( conns );
+			return( -1 );
+		}
+		// redirect
+		if( !conn_info( pconn ) )
+		{
+			axel_message( axel, pconn->message );
+			free( conns );
+			return( -1 );
+		}
+		// 更改url
+		s = conn_url( pconn );
+		strncpy( myurl, s, MAX_STRING );
+	}
+	free( conns );
+
+	return 0;
+}

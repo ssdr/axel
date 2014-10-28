@@ -25,13 +25,23 @@
 
 #include "axel.h"
 
+static int host2addr(const char *host, struct in_addr *addr, char *buff);
+
 /* Get a TCP connection */
 int tcp_connect( char *hostname, int port, char *local_if )
 {
 	struct sockaddr_in addr;
 	struct sockaddr_in local;
+	char *buff = NULL;
 	int fd;
 
+	if( host2addr( hostname, &(addr.sin_addr), buff ) )
+	{
+		printf( "Could not resove %s URL.\n", hostname);
+		free(buff);
+		return( -1 );
+	}
+	
 #ifdef DEBUG
 	socklen_t i = sizeof( local );
 	fprintf( stderr, "tcp_connect( %s, %i ) = ", hostname, port );
@@ -39,6 +49,7 @@ int tcp_connect( char *hostname, int port, char *local_if )
 
 	if( ( fd = socket( AF_INET, SOCK_STREAM, 0 ) ) == -1 )
 	{		
+		free(buff);
 		return( -1 );
 	}
 
@@ -50,6 +61,7 @@ int tcp_connect( char *hostname, int port, char *local_if )
 		if( bind( fd, (struct sockaddr *) &local, sizeof( struct sockaddr_in ) ) == -1 )
 		{
 			close( fd );
+			free(buff);
 			return( -1 );
 		}
 	}
@@ -57,13 +69,15 @@ int tcp_connect( char *hostname, int port, char *local_if )
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons( port );
 	//inet_aton( hostname, &addr.sin_addr );// 不可重入
-	inet_pton( AF_INET, hostname, &addr.sin_addr );// 可重入版本
+	//inet_pton( AF_INET, hostname, &addr.sin_addr );// 可重入版本
 
 	if( connect( fd, (struct sockaddr *) &addr, sizeof( struct sockaddr_in ) ) == -1 )
 	{
 		close( fd );
+		free(buff);
 		return( -1 );
 	}
+	free(buff);
 
 #ifdef DEBUG
 	getsockname( fd, &local, &i );
@@ -92,6 +106,31 @@ int get_if_ip( char *iface, char *ip )
 	{
 		return( 0 );
 	}
+}
+
+// 用于域名解析
+static int host2addr(const char *host, struct in_addr *addr, char *buff) 
+{
+	struct hostent he, *result;
+	int herr, ret, bufsz = 512;
+	// 清空下addr
+	memset( addr, 0, sizeof(struct in_addr) );
+	do {
+		char *new_buff = (char *)realloc(buff, bufsz);
+		if (new_buff == NULL) {
+			free(buff);
+			return ENOMEM;
+		}   
+		buff = new_buff;
+		ret = gethostbyname_r(host, &he, buff, bufsz, &result, &herr);
+		bufsz *= 2;
+	} while (ret == ERANGE);
+
+	if (ret == 0 && result != NULL) 
+		*addr = *(struct in_addr *)he.h_addr;
+	else if (result != &he) 
+		ret = herr;
+	return ret;
 }
 
 
