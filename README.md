@@ -5,7 +5,8 @@
 3，修改了一些在不可重入的函数，如gethostbyname()等。
 4，修改了下载过程中的进度输出方式，-a挺好用。
 5, 修改增加了对url中请求参数的支持。
-##configure pattern
-	./configure --prefix=/path/to/axel-install --i18n=0 --debug=1 --strip=0
 
+##Install Pattern
+	./configure --prefix=/path/to/axel-install --i18n=0 --debug=1 --strip=0
+	make/make install
 
