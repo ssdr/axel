@@ -77,6 +77,7 @@ int tcp_connect( char *hostname, int port, char *local_if )
 		free(buff);
 		return( -1 );
 	}
+	// free buffer
 	free(buff);
 
 #ifdef DEBUG

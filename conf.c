@@ -140,7 +140,7 @@ int conf_init( conf_t *conf )
 	conf->verbose			= -1;
 	conf->alternate_output	= 0;
 	// add by liuyan
-	conf->max_time			= 300; //5min
+	conf->max_time			= 5*24*60*60; // 5 days
 	
 	conf->search_timeout		= 10;
 	conf->search_threads		= 3;

@@ -356,7 +356,7 @@ int main( int argc, char *argv[] )
 	
 	while( !axel->ready && run )
 	{
-		// add by liuyan - 判断超时
+		// 判断超时
 		if( gettime() - axel->start_time > conf->max_time )
 		{
 			printf(_("\nTime's up (max_time=%ds) ! Download Incomplete!\n"), conf->max_time);
@@ -567,7 +567,7 @@ void print_version()
 		 "2, 支持unlimit=1请求参数;\n" );
 
 	printf( _("\nAxel version %s (%s)\n"), AXEL_VERSION_STRING, ARCH );
-	printf( "Copyright 2014 www.ifeng.com\n" );
+	printf( "Copyright 2014 edit by http://github.com/ssdr\n" );
 }
 
 /* Print any message in the axel structure				*/

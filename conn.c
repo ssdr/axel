@@ -330,7 +330,8 @@ int conn_info( conn_t *conn )
 				break;
 			if( ( t = http_header( conn->http, "location:" ) ) == NULL )
 				return( 0 );
-			sscanf( t, "%255s", s );
+			// 255 is a little bit small
+			sscanf( t, "%1023s", s );
 			if( strstr( s, "://" ) == NULL)
 			{
 				sprintf( conn->http->headers, "%s%s",

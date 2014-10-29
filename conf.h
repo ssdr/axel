@@ -37,7 +37,6 @@ typedef struct
 	int max_speed;
 	int verbose;
 	int alternate_output;
-	// add by liuyan
 	// Maximum time in seconds that you allow the whole operation to take
 	int max_time;
 	
